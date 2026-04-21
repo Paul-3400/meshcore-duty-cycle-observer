@@ -1,0 +1,46 @@
+{
+  "mqtt": {
+    "broker": "localhost",
+    "port": 1883,
+    "topic": "meshcore/+/+/packets"
+  },
+  "lora": {
+    "spreading_factor": 8,
+    "bandwidth_hz": 62500,
+    "coding_rate": 4,
+    "preamble": 8
+  },
+  "duty_cycle": {
+    "window_sec": 3600,
+    "limit_pct": 10.0,
+    "warning_pct": 8.0
+  },
+  "buffer": {
+    "delay_sec": 0
+  },
+  "logging": {
+    "log_dir": "logs"
+  },
+  "channels": [
+    "#Public",
+    "#test",
+    "#switzerland",
+    "#chtest",
+    "#bern",
+    "#zuerich",
+    "#wallis",
+    "#hamradio",
+    "#ping",
+    "#svizzera",
+    "#suisse",
+    "#qrv",
+    "#freiburg",
+    "#netzstatus",
+    "#muenchen",
+    "#flachwitze",
+    "#warnings",
+    "#blackout",
+    "#hard-software",
+    "#austria"
+  ]
+}

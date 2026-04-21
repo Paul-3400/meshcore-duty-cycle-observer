@@ -1,0 +1,234 @@
+================================================================================
+  MeshCore Duty-Cycle-Monitor – CSV Spalten-Glossar
+  Version: v0.7.2 | CSV-Format v5 (25 Spalten, seit 19. April 2026)
+  Trennzeichen: Semikolon (;) | Kodierung: UTF-8
+================================================================================
+
+
+--- Spalte A: packet_hash ---
+Einheit: Hex (16 Zeichen)
+Eindeutiger Fingerabdruck des gesamten Pakets (Header + Payload + Pfad).
+Aendert sich bei jedem Hop, weil der Pfad waechst.
+Analogie: Wie ein Stempel auf einem Brief, der bei jeder Poststelle
+einen Zusatzstempel bekommt.
+
+
+--- Spalte B: payload_hash ---
+Einheit: Hex (16 Zeichen)
+Fingerabdruck NUR des Inhalts (ohne Header/Pfad). Bleibt bei Duplikaten
+identisch – egal ueber welchen Weg das Paket kam.
+Analogie: Der Briefinhalt ist immer derselbe, auch wenn der Umschlag
+anders aussieht.
+
+
+--- Spalte C: timestamp ---
+Einheit: ISO 8601 (yyyy-MM-ddTHH:mm:ss)
+Zeitpunkt des Empfangs auf unserem Heltec Monitor.
+Analogie: Der Posteingangsstempel in unserer Poststelle.
+
+
+--- Spalte D: packet_type ---
+Einheit: Text
+Art des Pakets:
+  ADVERT   = Visitenkarte eines Knotens (Name, GPS, Rolle)
+  REQ      = Anfrage (z.B. Ping)
+  RESPONSE = Antwort auf eine Anfrage
+  TXT_MSG  = Privatnachricht
+  ACK      = Empfangsbestaetigung
+  GRP_TXT  = Gruppennachricht
+  ANON_REQ = Anonyme Anfrage
+  PATH     = Routing-Information
+  TRACE    = Pfad-Qualitaetsmessung
+Analogie: Brieftypen – Postkarte, Einschreiben, Rundschreiben etc.
+
+
+--- Spalte E: route_type ---
+Einheit: Text
+Wie das Paket verteilt wird:
+  FLOOD    = An alle weiterleiten (Rundschreiben)
+  DIRECT   = Gezielt an einen Empfaenger (Einschreiben)
+  T_FLOOD  = Wie FLOOD, aber mit Transport-Header (Region Code)
+  T_DIRECT = Wie DIRECT, aber mit Transport-Header
+Analogie: Massenversand vs. Einschreiben.
+
+
+--- Spalte F: bytes ---
+Einheit: Bytes (Ganzzahl)
+Gesamtgroesse des Pakets. Groessere Pakete brauchen laenger zum Senden
+(mehr Airtime).
+Analogie: Gewicht eines Briefs – schwerer = teurer (mehr Porto/Airtime).
+
+
+--- Spalte G: airtime_ms ---
+Einheit: Millisekunden (ms)
+Dauer, die das Paket die Funkfrequenz belegt hat. Berechnet aus Bytes +
+LoRa-Parametern (SF8, BW 62.5kHz, CR 4/8).
+Analogie: Wie lange jemand das Mikrofon am Walkie-Talkie gedrueckt haelt.
+
+
+--- Spalte H: hops ---
+Einheit: Anzahl (Ganzzahl)
+Wie viele Repeater das Paket weitergeleitet haben, bevor es bei uns ankam.
+0 = direkt empfangen.
+Analogie: Anzahl Poststellen, die den Brief weitergeleitet haben.
+
+
+--- Spalte I: path_hash_bytes ---
+Einheit: 1, 2 oder 3
+Anzahl Bytes pro Hop-Hash im Pfad:
+  1 = Legacy (256 Werte, viele Kollisionen)
+  2 = Mode 1 (65'536 Werte)
+  3 = Mode 2 (16 Mio. Werte)
+Analogie: 1 = nur Vorname, 2 = Vor- und Nachname, 3 = voller Name
+mit Mittelnamen.
+
+
+--- Spalte J: rssi ---
+Einheit: dBm (Dezibel Milliwatt)
+Empfangssignalstaerke. Je naeher an 0, desto staerker das Signal.
+  -43 bis -53 dBm = Lokal (Repeater, Companion)
+  -99 bis -117 dBm = Entfernte Knoten
+Analogie: Lautstaerke einer Stimme – nah = laut (-50), weit weg =
+leise (-110).
+
+
+--- Spalte K: snr ---
+Einheit: dB (Dezibel)
+Signal-Rausch-Verhaeltnis. Wie gut das Signal vom Hintergrundrauschen
+unterscheidbar ist.
+  Positiv (z.B. +10) = Klares Signal
+  Negativ (z.B. -8)  = Schwaches Signal
+Analogie: Gespraech im Restaurant – SNR +10 = ruhiges Lokal,
+SNR -8 = laute Musik, man versteht kaum etwas.
+
+
+--- Spalte L: source_hash ---
+Einheit: Hex (2 Zeichen)
+Kurzkennung des Absenders (1 Byte aus dem Public Key).
+Nur 256 moegliche Werte – Kollisionen wahrscheinlich!
+Analogie: Initialen einer Person – "PM" koennte Peter Mueller
+oder Paul Meier sein.
+
+
+--- Spalte M: source_name ---
+Einheit: Text
+Klarname des Absenders, wenn bekannt (aus ADVERT). Bei anderen
+Pakettypen: Lookup aus frueheren ADVERTs.
+Analogie: Absendername auf dem Briefumschlag.
+
+
+--- Spalte N: source_collision ---
+Einheit: Anzahl (Ganzzahl)
+Wie viele verschiedene Knoten denselben source_hash teilen.
+0 = eindeutig, >1 = Kollision.
+Analogie: Wie viele "PM" gibt es im Telefonbuch?
+
+
+--- Spalte O: dest_hash ---
+Einheit: Hex (2 Zeichen)
+Kurzkennung des Empfaengers. Nur bei gezielten Nachrichten
+(REQ, RESPONSE, TXT_MSG, ACK). Leer bei FLOOD-Paketen.
+Analogie: Empfaengeradresse auf dem Brief.
+
+
+--- Spalte P: dest_name ---
+Einheit: Text
+Klarname des Empfaengers, wenn bekannt (aus frueherem ADVERT).
+Analogie: "An Herrn Mueller" statt nur die Hausnummer.
+
+
+--- Spalte Q: dest_collision ---
+Einheit: Anzahl (Ganzzahl)
+Wie bei source_collision, aber fuer den Empfaenger-Hash.
+Analogie: Wie viele Bewohner hat die Empfaengeradresse?
+
+
+--- Spalte R: node_mode ---
+Einheit: Text
+Rolle/Typ des Knotens (nur bei ADVERT):
+  Repeater    = Leitet Pakete weiter
+  Room Server = Chat-Server
+  Client      = Endgeraet
+Analogie: Poststelle (Repeater), Postfach (Room Server)
+oder Briefkasten (Client).
+
+
+--- Spalte S: node_key ---
+Einheit: Hex (8 Zeichen)
+Ersten 4 Bytes des Public Key des Knotens. Nur bei ADVERT.
+Eindeutiger als source_hash.
+Analogie: Die AHV-Nummer statt nur die Initialen.
+
+
+--- Spalte T: lat ---
+Einheit: Dezimalgrad (WGS84)
+Breitengrad des Knotens. Nur bei ADVERT mit aktivem GPS.
+Bern = ca. 46.95. Leer oder 0 = GPS nicht aktiv.
+Analogie: Nord-Sued-Koordinate auf der Landkarte.
+
+
+--- Spalte U: lon ---
+Einheit: Dezimalgrad (WGS84)
+Laengengrad des Knotens. Bern = ca. 7.45.
+Analogie: Ost-West-Koordinate auf der Landkarte.
+
+
+--- Spalte V: region_code ---
+Einheit: Hex (2 Zeichen)
+Regionskennung aus dem Transport-Header. Nur bei T_FLOOD
+und T_DIRECT Paketen.
+Analogie: Postleitzahl fuer die Mesh-Region.
+
+
+--- Spalte W: channel ---
+Einheit: Hex (2 Zeichen)
+Kanal-Hash bei Gruppennachrichten (GRP_TXT). Bestimmt in
+welcher "Gruppe" gesendet wird.
+Analogie: Radio-Kanal – verschiedene Gruppen funken auf
+verschiedenen Kanaelen.
+
+
+--- Spalte X: message ---
+Einheit: Text
+Entschluesselte Nachricht bei GRP_TXT (wenn Kanal-Key bekannt).
+Beispiel: "#Public", "#freiburg", "#test"
+Analogie: Der eigentliche Briefinhalt – nur lesbar wenn man
+den Schluessel hat.
+
+
+--- Spalte Y: window_dc_pct ---
+Einheit: Prozent (%)
+Kumulierter Duty Cycle im aktuellen Zeitfenster (3600s).
+Summe aller Airtimes geteilt durch Fensterlaenge.
+EU-Limit: 10% (= 360 Sekunden pro Stunde).
+Analogie: Wie viel Redezeit wurde in der letzten Stunde
+verbraucht? Bei 10% ist Schluss.
+
+
+================================================================================
+  Hinweise fuer Numbers
+================================================================================
+
+- Trennzeichen beim Import: Semikolon (;)
+- Textkodierung: UTF-8
+- Zeile 1 = Header (Spaltentitel)
+- Leere Felder = Information nicht verfuegbar fuer diesen Pakettyp
+- RSSI und SNR koennen negative Werte haben
+- window_dc_pct ist kumulativ und wird stuendlich zurueckgesetzt
+
+
+================================================================================
+  LoRa-Parameter (fix konfiguriert)
+================================================================================
+
+- Spreading Factor: SF8
+- Bandbreite: 62.5 kHz
+- Coding Rate: CR 4/8
+- Frequenz: 869.618 MHz
+- Duty Cycle Limit: 10% (EU-Regulierung)
+
+
+================================================================================
+  Erstellt: 20. April 2026 | Projekt: meshcore-duty-cycle-monitor v0.7.2
+  GitHub: https://github.com/Paul-3400/meshcore-duty-cycle-monitor
+================================================================================

@@ -1,0 +1,26 @@
+# Persoenliche Konfiguration
+config.json
+
+# Virtuelle Python-Umgebung
+venv/
+
+# Log-Dateien und Reports (persoenliche Messdaten)
+logs/
+
+# Backup-Dateien
+*_backup.py
+*.bak
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Betriebssystem-Dateien
+.DS_Store
+Thumbs.db
+
+# Editor-Dateien
+*.swp
+*.swo
+*~

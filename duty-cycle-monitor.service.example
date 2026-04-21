@@ -1,0 +1,20 @@
+[Unit]
+Description=MeshCore Duty-Cycle-Observer v1.0.0
+Documentation=https://github.com/Paul-3400/meshcore-duty-cycle-observer
+After=mosquitto.service
+Wants=mosquitto.service
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+Group=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/meshcore-duty-cycle-observer
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/YOUR_USERNAME/meshcore-duty-cycle-observer/venv/bin/python3 /home/YOUR_USERNAME/meshcore-duty-cycle-observer/monitor.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
