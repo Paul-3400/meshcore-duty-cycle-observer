@@ -1,6 +1,4 @@
-Hier kommt die komplette README – in Englisch für die internationale MeshCore-Community:
-
-markdownVergrössernVorschau anzeigenKopieren# MeshCore Duty-Cycle-Observer
+# MeshCore Duty-Cycle-Observer
 
 A passive LoRa packet monitor for [MeshCore](https://meshcore.net) mesh networks. Receives packets via MQTT, decodes headers and payloads, calculates LoRa airtime and duty cycle, and logs everything to CSV files for analysis.
 
