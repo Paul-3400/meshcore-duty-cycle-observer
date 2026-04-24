@@ -140,45 +140,13 @@ CSV_HEADER = [
     "region_code", "channel", "message",
     "window_dc_pct"]
 
-csv_file = None
-csv_writer_obj = None
 csv_current_date = None
 csv_rows_written = 0
 
 
 def open_csv_file():
-    global csv_file, csv_writer_obj
-    global csv_current_date, csv_rows_written
-    today = date.today()
-    if csv_current_date == today and csv_file is not None:
-        return True
-    close_csv_file()
-    filename = "duty_cycle_" + today.strftime(
-        "%Y-%m-%d") + ".csv"
-    filepath = os.path.join(LOG_DIR, filename)
-    file_exists = os.path.exists(filepath)
-    try:
-        csv_file = open(
-            filepath, "a", newline="",
-            encoding="utf-8")
-        csv_writer_obj = csv.writer(
-            csv_file, delimiter=";")
-        if not file_exists or os.path.getsize(
-                filepath) == 0:
-            csv_writer_obj.writerow(CSV_HEADER)
-            if csv_rows_written % 50 == 0:
-                csv_file.flush()
-            print("  CSV: Neue Datei " + filename)
-        else:
-            print("  CSV: Fortgesetzt " + filename)
-        csv_current_date = today
-        csv_rows_written = 0
-        return True
-    except Exception as e:
-        print("  CSV-Fehler: " + str(e))
-        csv_file = None
-        csv_writer_obj = None
-        return False
+    """Kompatibilitaets-Stub (nicht mehr benoetigt)."""
+    pass
 
 
 def write_csv_row(
@@ -189,37 +157,49 @@ def write_csv_row(
         node_mode, node_key,
         lat, lon, region_code,
         channel, message, window_dc):
-    global csv_rows_written
-    open_csv_file()
-    if csv_writer_obj is None:
-        return
+    global csv_current_date, csv_rows_written
+    today = date.today()
+    filename = "duty_cycle_" + today.strftime(
+        "%Y-%m-%d") + ".csv"
+    filepath = os.path.join(LOG_DIR, filename)
+    write_header = (not os.path.exists(filepath)
+                    or os.path.getsize(filepath) == 0)
+
+    if csv_current_date != today:
+        if write_header:
+            print("  CSV: Neue Datei " + filename)
+        else:
+            print("  CSV: Fortgesetzt " + filename)
+        csv_current_date = today
+        csv_rows_written = 0
+
     try:
-        csv_writer_obj.writerow([
-            pkt_hash, payload_hash, timestamp, ptype_name, rtype_name,
-            pkt_bytes, round(airtime_ms, 1),
-            hops, path_hash_bytes, rssi, snr,
-            source_hash, source_name, source_collision,
-            dest_hash, dest_name, dest_collision,
-            node_mode, node_key,
-            lat, lon, region_code,
-            channel, message,
-            round(window_dc, 4)])
-        csv_file.flush()
+        with open(filepath, "a", newline="",
+                  encoding="utf-8") as f:
+            writer = csv.writer(f, delimiter=";")
+            if write_header:
+                writer.writerow(CSV_HEADER)
+            writer.writerow([
+                pkt_hash, payload_hash, timestamp,
+                ptype_name, rtype_name,
+                pkt_bytes, round(airtime_ms, 1),
+                hops, path_hash_bytes, rssi, snr,
+                source_hash, source_name,
+                source_collision,
+                dest_hash, dest_name,
+                dest_collision,
+                node_mode, node_key,
+                lat, lon, region_code,
+                channel, message,
+                round(window_dc, 4)])
         csv_rows_written += 1
     except Exception as e:
         print("  CSV-Schreibfehler: " + str(e))
 
 
 def close_csv_file():
-    global csv_file, csv_writer_obj
-    if csv_file is not None:
-        try:
-            csv_file.flush()
-            csv_file.close()
-        except Exception:
-            pass
-        csv_file = None
-        csv_writer_obj = None
+    """Kompatibilitaets-Stub (nicht mehr benoetigt)."""
+    pass
 
 
 def decode_path_len(plb):
@@ -340,9 +320,9 @@ def parse_packet(raw_hex):
                 if has_gps and len(payload) >= 109:
                     try:
                         lat = struct.unpack(
-                            "<f", payload[101:105])[0]
+                            "<i", payload[101:105])[0] / 1_000_000
                         lon = struct.unpack(
-                            "<f", payload[105:109])[0]
+                            "<i", payload[105:109])[0] / 1_000_000
                         if abs(lat) < 0.01 and abs(lon) <  0.01:
                             pass
                         elif -90 <= lat <= 90:
