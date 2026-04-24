@@ -22,7 +22,7 @@ The observer sits quietly on your network and watches all LoRa traffic passing t
 - **Airtime Calculation** – Precise LoRa airtime based on SF, bandwidth, and coding rate
 - **Duty Cycle Monitoring** – Rolling 1-hour window with EU 10% limit warning
 - **Source/Destination Lookup** – Resolves node hashes to names via ADVERT history
-- **GPS Extraction** – Latitude/longitude from ADVERT packets
+- **GPS Extraction** – Latitude/longitude from ADVERT packets (signed int32 microdegrees)
 - **Group Message Decryption** – Decrypts known channel hashtags (e.g. #Public, #test)
 - **Hash Collision Detection** – Flags when multiple nodes share the same 1-byte hash
 - **Path Hash Support** – Supports 1-byte (legacy), 2-byte, and 3-byte path hash modes
@@ -451,13 +451,13 @@ First 4 bytes of public key (ADVERT only)
 T
 lat
 Decimal degrees
-GPS latitude (ADVERT only)
+GPS latitude, decoded from int32 microdegrees (ADVERT only)
 
 
 U
 lon
 Decimal degrees
-GPS longitude (ADVERT only)
+GPS longitude, decoded from int32 microdegrees (ADVERT only)
 
 
 V
@@ -535,6 +535,7 @@ cp config.example.json config.json
 
 
 Zombie process after reboot
+| GPS always 0.0 or near-zero | GPS decoded as float instead of int32 | Coordinates are signed int32 microdegrees: `struct.unpack("
 Old process survived
 ps aux | grep monitor.py → kill <PID>
 

@@ -72,8 +72,8 @@ Byte 0-31: Public Key (Ed25519, 32 Bytes)
 Byte 32-35: Timestamp (Unix, 4 Bytes)
 Byte 36-99: Signature (Ed25519, 64 Bytes)
 Byte 100: App Flags
-Byte 101-104: Latitude (float32, falls Flag gesetzt)
-Byte 105-108: Longitude (float32, falls Flag gesetzt)
+Byte 101-104: Latitude (signed int32, Mikrodegrees, falls GPS-Flag gesetzt)
+Byte 105-108: Longitude (signed int32, Mikrodegrees, falls GPS-Flag gesetzt)
 Byte 109+: Node Name (ASCII)
 
 
