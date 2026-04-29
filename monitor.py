@@ -143,12 +143,33 @@ CSV_HEADER = [
 csv_current_date = None
 csv_rows_written = 0
 
+def reset_daily_stats():
+    """Zeitungslesen-Prinzip: Jeden Tag frisch starten."""
+    global total_pkts, total_air_ms
+    known_nodes_by_hash.clear()
+    known_nodes_by_key.clear()
+    type_stats.clear()
+    sender_stats.clear()
+    total_pkts = 0
+    total_air_ms = 0.0
+    print("  Tages-Reset: Alle Zaehler und Kollisions-Dicts zurueckgesetzt")
+
 
 def open_csv_file():
     """Kompatibilitaets-Stub (nicht mehr benoetigt)."""
     pass
 
-
+def reset_daily_stats():
+    """Zeitungslesen-Prinzip: Jeden Tag frisch starten."""
+    global total_pkts, total_air_ms
+    known_nodes_by_hash.clear()
+    known_nodes_by_key.clear()
+    type_stats.clear()
+    sender_stats.clear()
+    total_pkts = 0
+    total_air_ms = 0.0
+    print("  Tages-Reset: Alle Zaehler und Kollisions-Dicts zurueckgesetzt")
+    
 def write_csv_row(
         pkt_hash, payload_hash, timestamp, ptype_name, rtype_name,
         pkt_bytes, airtime_ms, hops, path_hash_bytes, rssi, snr,
@@ -166,6 +187,9 @@ def write_csv_row(
                     or os.path.getsize(filepath) == 0)
 
     if csv_current_date != today:
+        if csv_current_date is not None:
+            reset_daily_stats()
+
         if write_header:
             print("  CSV: Neue Datei " + filename)
         else:
@@ -198,8 +222,50 @@ def write_csv_row(
 
 
 def close_csv_file():
-    """Kompatibilitaets-Stub (nicht mehr benoetigt)."""
-    pass
+    """Tagesabschluss: Zusammenfassung loggen und Zaehler zuruecksetzen."""
+    global csv_current_date, csv_rows_written
+    if csv_current_date is not None:
+        print("\n" + "=" * 60)
+        print("  CSV-Tagesabschluss: " + str(csv_current_date))
+        print("  Zeilen geschrieben: " + str(csv_rows_written))
+        print("=" * 60 + "\n")
+    csv_current_date = None
+    csv_rows_written = 0
+
+
+def schedule_midnight_rotation():
+    """Mitternacht-Wecker: Plant den taeglichen CSV-Reset."""
+    now = datetime.now()
+    midnight = now.replace(
+        hour=0, minute=0, second=0, microsecond=0
+    ) + timedelta(days=1)
+    seconds_until = (midnight - now).total_seconds()
+    print("  Naechste CSV-Rotation in "
+          + str(round(seconds_until)) + "s ("
+          + midnight.strftime("%Y-%m-%d %H:%M") + ")")
+
+    def _do_rotation():
+        print("\n*** MITTERNACHT-ROTATION ***")
+        close_csv_file()
+        # Neue leere CSV mit Header erstellen
+        today = date.today()
+        filename = ("duty_cycle_"
+                     + today.strftime("%Y-%m-%d") + ".csv")
+        filepath = os.path.join(LOG_DIR, filename)
+        try:
+            with open(filepath, "w", newline="",
+                       encoding="utf-8") as f:
+                writer = csv.writer(f, delimiter=";")
+                writer.writerow(CSV_HEADER)
+            print("  Neue CSV erstellt: " + filename)
+        except Exception as e:
+            print("  Fehler beim Erstellen: " + str(e))
+        # Wecker neu stellen
+        schedule_midnight_rotation()
+
+    timer = threading.Timer(seconds_until, _do_rotation)
+    timer.daemon = True
+    timer.start()
 
 
 def decode_path_len(plb):
@@ -869,6 +935,7 @@ def main():
     client.on_message = on_message
     client.on_disconnect = on_disconnect
     client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
+    schedule_midnight_rotation()
     client.loop_forever()
 
 
