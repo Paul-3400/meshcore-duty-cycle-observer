@@ -1,6 +1,6 @@
 # MeshCore Duty-Cycle-Observer
 
-A passive LoRa packet monitor for [MeshCore](https://meshcore.net) mesh networks. Receives packets via MQTT, decodes headers and payloads, calculates LoRa airtime and duty cycle, and logs everything to CSV files for analysis.
+A passive LoRa packet monitor for [MeshCore](https://meshcore.io) mesh networks. Receives packets via MQTT, decodes headers and payloads, calculates LoRa airtime and duty cycle, and logs everything to CSV files for analysis.
 
 ---
 
@@ -18,7 +18,7 @@ The observer sits quietly on your network and watches all LoRa traffic passing t
 
 ## Features
 
-- **Packet Decoding** – Identifies ADVERT, REQ, RESPONSE, TXT_MSG, ACK, GRP_TXT, ANON_REQ, PATH, and TRACE packets
+- **Packet Decoding** – - Identifies ADVERT, REQ, RESPONSE, TXT_MSG, ACK, GRP_TXT, ANON_REQ, PATH, TRACE, CONTROL, and GRP_DATA packets
 - **Airtime Calculation** – Precise LoRa airtime based on SF, bandwidth, and coding rate
 - **Duty Cycle Monitoring** – Rolling 1-hour window with EU 10% limit warning
 - **Source/Destination Lookup** – Resolves node hashes to names via ADVERT history
@@ -30,6 +30,7 @@ The observer sits quietly on your network and watches all LoRa traffic passing t
 - **CSV Logging** – 25-column semicolon-separated CSV, one file per day
 - **Duplicate Detection** – Optional payload-based duplicate filtering
 - **systemd Service** – Runs as a background service with auto-restart
+- Automatic midnight CSV rotation with daily summary and counter reset
 
 ---
 
@@ -355,7 +356,7 @@ Time of reception
 D
 packet_type
 Text
-ADVERT, REQ, RESPONSE, TXT_MSG, ACK, GRP_TXT, ANON_REQ, PATH, TRACE
+ADVERT, REQ, RESPONSE, TXT_MSG, ACK, GRP_TXT, ANON_REQ, PATH, TRACE, CONTROL, or GRP_DATA
 
 
 E
