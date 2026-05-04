@@ -20,7 +20,7 @@ Before installing the observer, make sure the following components are running:
 # Verify MQTT is running and packets are flowing:
 mosquitto_sub -h localhost -t "meshcore/#" -v
 ```
-> If you see JSON packets appearing, your pipeline is ready for the observer.
+> If you see JSON packets appearing, your pipeline is ready for the observer!
 ---
 
 ## 🔧 Installation
