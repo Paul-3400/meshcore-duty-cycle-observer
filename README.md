@@ -6,7 +6,21 @@ Web-based dashboard for visualizing [MeshCore](https://meshcore.io/) LoRa packet
 ![Flask](https://img.shields.io/badge/Flask-3.1-green)
 ![Leaflet](https://img.shields.io/badge/Leaflet.js-1.9-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
+---
 
+## 📋 Prerequisites
+
+Before installing the observer, make sure the following components are running:
+
+1. **MeshCore Node** – Connected via USB (e.g. Heltec V3)
+2. **Packet Capture Client** – Reads packets from the node and publishes them to MQTT. See [meshcore-packet-capture](https://github.com/fdlamber/meshcore-packet-capture)
+3. **MQTT Broker** – e.g. Mosquitto, running on localhost or a reachable host
+
+```bash
+# Verify MQTT is running and packets are flowing:
+mosquitto_sub -h localhost -t "meshcore/#" -v
+```
+> If you see JSON packets appearing, your pipeline is ready for the observer.
 ---
 
 ## 🔧 Installation
